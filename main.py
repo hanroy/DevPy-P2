@@ -20,7 +20,7 @@ for url in urls:
         response = requests.get(book_url)
         soup = BeautifulSoup(response.content, "lxml")
 
-        
+
         print("Title of the book :" + soup.find('h1').get_text())
         print("price_including_tax: " + soup.find_all('tr')[3].get_text())
         print("price_excluding_tax: " + soup.find_all('tr')[2].get_text())     
@@ -29,13 +29,4 @@ for url in urls:
         print("product_description :" + soup.find_all('p')[3].get_text())
         print("category : " + soup.find_all('a')[3].get_text())
         print("review_rating :" + soup.find_all('tr')[6].get_text())
-        image_url = soup.find_all('img')[0]
-        print(image_url)
-'''    
-    # Get the books title
-        title = book.select_one('a img')['alt']
-        print ("Title of the book :" + title)
-'''
-
-        
-
+        print("image url :" + urljoin('https://books.toscrape.com/', soup.find("img")["src"] ))
