@@ -2,7 +2,20 @@ from bs4 import BeautifulSoup
 import requests
 from urllib.parse import urljoin
 
-urls = ['http://books.toscrape.com/catalogue/category/books/mystery_3/index.html', 'https://books.toscrape.com/catalogue/category/books/mystery_3/page-2.html']
+main_url = 'http://books.toscrape.com/catalogue/category/books/mystery_3/index.html'
+
+response = requests.get(main_url)
+soup = BeautifulSoup(response.text, "lxml")
+
+footer_element = soup.select_one('li.current')
+
+# Find the next page to scrape in the pagination.
+next_page_element = soup.select_one('li.next > a')
+if next_page_element:
+    next_page_url = next_page_element.get('href')
+    urli = urljoin(main_url, next_page_url)
+
+urls = [main_url, urli]
 
 # open a file in append mode to write into in the same directory where we ran this script from
 csvfile = open('data.csv', 'w')
