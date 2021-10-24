@@ -1,6 +1,7 @@
 from bs4 import BeautifulSoup 
 import requests
 from urllib.parse import urljoin
+import csv
 
 main_url = 'http://books.toscrape.com/catalogue/category/books/mystery_3/index.html'
 
@@ -46,6 +47,6 @@ for url in urls:
         number_available = soup.find_all('td')[5].get_text() 
         product_description = soup.find_all('p')[3].get_text()
         category = soup.find_all('a')[3].get_text() 
-        review_rating = soup.find_all('td')[6].get_text() 
+        review_rating = soup.find('p', attrs={'class': 'star-rating'})['class'][1] 
         image_url = urljoin('https://books.toscrape.com/', soup.find("img")["src"] ) 
         csvwriter.writerow([book_url, universal_product_code.strip(), title.strip(), price_including_tax, price_excluding_tax, number_available, category, review_rating, image_url, product_description ]
