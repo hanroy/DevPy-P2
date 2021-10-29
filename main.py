@@ -2,6 +2,7 @@ from bs4 import BeautifulSoup
 import requests
 from urllib.parse import urljoin
 import csv
+import os
 
 main_url = 'http://books.toscrape.com/catalogue/category/books/mystery_3/index.html'
 
@@ -58,6 +59,14 @@ def create_csv (urls_1):
             image_url = urljoin('https://books.toscrape.com/', soup.find("img")["src"] ) 
             #csvwriter.writerow([book_url, universal_product_code, title.strip(), price_including_tax, price_excluding_tax,number_available, product_description, category, review_rating, image_url  ])
             csvwriter.writerow([book_url, universal_product_code.strip(), title.strip(), price_including_tax, price_excluding_tax, number_available, category, review_rating, image_url, product_description ])
+
+            #Download images related books
+            r = requests.get(image_url)
+                # Create the folder in path.
+            os.makedirs('images', exist_ok = True)
+            filename = os.path.join('images', image_url.split("/")[-1])
+            open(filename, 'wb').write(r.content)
+
 
 create_csv(urls)
 
