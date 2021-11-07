@@ -8,7 +8,7 @@ import re #gère les expressions régulières
 main_url = 'http://books.toscrape.com/catalogue/category/books/mystery_3/index.html'
 
 html = requests.get(main_url)
-page = BeautifulSoup(html.content, "html.parser")
+page = BeautifulSoup(html.content, "lxml")
 category = page.find('h1').get_text() 
 
 urls = [main_url]
@@ -42,7 +42,7 @@ csvwriter.writerow(fields)
 def create_csv (urls_1):
     for url in urls_1:
         response = requests.get(url)
-        soup = BeautifulSoup(response.content, "html.parser")
+        soup = BeautifulSoup(response.content, "lxml")
         books = soup.find("section")
         book_list = books.find_all(class_="product_pod")
 
@@ -51,7 +51,7 @@ def create_csv (urls_1):
             ref = book.find("a")["href"]
             book_url = urljoin(url, ref )
             response = requests.get(book_url)
-            soup = BeautifulSoup(response.content, "html.parser")
+            soup = BeautifulSoup(response.content, "lxml")
 
             universal_product_code = soup.find_all('tr')[0].get_text() 
             title = soup.find('h1').get_text() 

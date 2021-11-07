@@ -10,7 +10,7 @@ import re #gère les expressions régulières
 
 def get_categories():
     response = requests.get(url)
-    soup = BeautifulSoup(response.content, "html.parser")
+    soup = BeautifulSoup(response.content, "lxml")
     sidebar = soup.find("ul", class_="nav nav-list").find_all("a")
     categories = []
     for cate in sidebar:
@@ -25,7 +25,7 @@ def get_all_category_urls(category_link): # traitement de la pagination
     all_book_urls = []
     for u in category_link:
         response = requests.get(u)
-        page = BeautifulSoup(response.content, "html.parser")
+        page = BeautifulSoup(response.content, "lxml")
 
         pagination = page.select_one('li.current')
         
@@ -49,7 +49,7 @@ def get_all_category_urls(category_link): # traitement de la pagination
 
 url = "https://books.toscrape.com/"
 response = requests.get(url)
-soup = BeautifulSoup(response.content, "html.parser")
+soup = BeautifulSoup(response.content, "lxml")
 
 
 list_of_categories = get_categories()
@@ -74,7 +74,7 @@ for index in list_of_categories[1:]: #traitement des catégories sans prise en c
 
     for book_urls in all_categories_url:
         response = requests.get(book_urls)
-        soup = BeautifulSoup(response.content, "html.parser")
+        soup = BeautifulSoup(response.content, "lxml")
         books = soup.find("section")
         book_list = books.find_all(class_="product_pod")
 
@@ -83,7 +83,7 @@ for index in list_of_categories[1:]: #traitement des catégories sans prise en c
             ref = book.find("a")["href"]
             book_url = urljoin(book_urls, ref)
             response = requests.get(book_url)
-            soup = BeautifulSoup(response.content, "html.parser")
+            soup = BeautifulSoup(response.content, "lxml")
 
             universal_product_code = soup.find_all('tr')[0].get_text() 
             title = soup.find('h1').get_text() 
