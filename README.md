@@ -1,6 +1,6 @@
 
 
-# <div align="center"> [DA-Python] Projet N°2: scrapping.py </div>
+# <div align="center"> [DA-Python] Projet N°2 </div>
 # <p align="center"><img width=40% src="https://github.com/hanroy/DevPy-P2/blob/main/img/webscrapping.png?raw=true"></p>
 # <div align="center"> Script (ETL) d'extraction, transformation et de chargement de data depuis un site web </div>
 
