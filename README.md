@@ -27,6 +27,18 @@ Extraire les données suivantes depuis le site https://books.toscrape.com/ puis 
 
 ## <a name="part2"> 2. Configuration de l'environnement: </a>
 
+- Cloner ce repository 
+
+```
+git clone https://github.com/hanroy/DevPy-P2.git
+```
+
+- Se positionner dans le dossier 
+
+```
+cd DevPy-P2
+```
+
 - Créer un environnement via la commande 
 
 ```
