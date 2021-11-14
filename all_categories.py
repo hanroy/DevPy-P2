@@ -4,6 +4,7 @@ from urllib.parse import urljoin #permet la gestion des url
 import csv #permet la création et manipulation des fichiers csv
 import os #permet d’effectuer des opérations courantes liées au système d’exploitation
 import re #gère les expressions régulières
+import sys #fournit des fonctions et des variables qui permettent d’interagir avec l’interpréteur Python 
 
 ############################-- Declaration des functions --#############################
 
@@ -49,59 +50,65 @@ def get_all_category_urls(category_link): # traitement de la pagination
 
 url = "https://books.toscrape.com/"
 response = requests.get(url)
-soup = BeautifulSoup(response.content, "lxml")
+if response.status_code != 200:
+    print(f"UNREACHABLE URL response code {response.status_code}")
+    sys.exit(1)
+
+else:
+    soup = BeautifulSoup(response.content, "lxml")
 
 
-list_of_categories = get_categories()
+    list_of_categories = get_categories()
 
-for index in list_of_categories[1:]: #traitement des catégories sans prise en compte de la caté Books
-    links = []
-    category_name = index[0]
-    category_link = index[1]
-    links.append(category_link)  
+    for index in list_of_categories[1:]: #traitement des catégories sans prise en compte de la caté Books
+        links = []
+        category_name = index[0]
+        category_link = index[1]
+        links.append(category_link)  
 
-# créer le dossier data + les csv qui porteront la data de chaque catégorie/livre
-    csvfolder = './books_data'
-    os.makedirs("books_data", exist_ok=True)
-    csvpath = f"{csvfolder}/{'data-{}.csv'.format(category_name)}" 
-    csvname = open(csvpath, "w")           
-    csvwriter = csv.writer(csvname)
-    fields = ["product_page_url","universal_product_code","title", "price_including_tax","price_excluding_tax","number_available","category","review_rating","image_url", "product_description"]
-    csvwriter.writerow(fields)
+    # créer le dossier data + les csv qui porteront la data de chaque catégorie/livre
+        csvfolder = './books_data'
+        os.makedirs("books_data", exist_ok=True)
+        csvpath = f"{csvfolder}/{'data-{}.csv'.format(category_name)}" 
+        csvname = open(csvpath, "w")           
+        csvwriter = csv.writer(csvname)
+        fields = ["product_page_url","universal_product_code","title", "price_including_tax","price_excluding_tax","number_available","category","review_rating","image_url", "product_description"]
+        csvwriter.writerow(fields)
 
-    # print les urls des catégories et les paginations respectives
-    all_categories_url = get_all_category_urls(links)
+        # print les urls des catégories et les paginations respectives
+        all_categories_url = get_all_category_urls(links)
 
-    for book_urls in all_categories_url:
-        response = requests.get(book_urls)
-        soup = BeautifulSoup(response.content, "lxml")
-        books = soup.find("section")
-        book_list = books.find_all(class_="product_pod")
-
-        # extraire l'url de chaque livre
-        for book in book_list:
-            ref = book.find("a")["href"]
-            book_url = urljoin(book_urls, ref)
-            response = requests.get(book_url)
+        for book_urls in all_categories_url:
+            response = requests.get(book_urls)
             soup = BeautifulSoup(response.content, "lxml")
+            books = soup.find("section")
+            book_list = books.find_all(class_="product_pod")
 
-            universal_product_code = soup.find_all('tr')[0].get_text() 
-            title = soup.find('h1').get_text() 
-            price_including_tax = soup.find_all('td')[3].get_text()
-            price_excluding_tax = soup.find_all('td')[2].get_text()
-            number_available = soup.find_all('td')[5].get_text() 
-            product_description = soup.find_all('p')[3].get_text()
-            category = soup.find_all('a')[3].get_text() 
-            review_rating = soup.find('p', class_='star-rating').get('class')[1]
-            image_url = urljoin('https://books.toscrape.com/', soup.find("img")["src"] ) 
-            print(category_name + "---> " + title)
-            csvwriter.writerow([book_url, universal_product_code.strip(), title.strip(), price_including_tax, price_excluding_tax, number_available, category, review_rating, image_url, product_description ])
+            # extraire l'url de chaque livre
+            for book in book_list:
+                ref = book.find("a")["href"]
+                book_url = urljoin(book_urls, ref)
+                response = requests.get(book_url)
+                soup = BeautifulSoup(response.content, "lxml")
+
+                universal_product_code = soup.find_all('tr')[0].get_text() 
+                title = soup.find('h1').get_text() 
+                price_including_tax = soup.find_all('td')[3].get_text()
+                price_excluding_tax = soup.find_all('td')[2].get_text()
+                number_available = soup.find_all('td')[5].get_text() 
+                product_description = soup.find_all('p')[3].get_text()
+                category = soup.find_all('a')[3].get_text() 
+                review_rating = soup.find('p', class_='star-rating').get('class')[1]
+                image_url = urljoin('https://books.toscrape.com/', soup.find("img")["src"] ) 
+                print(category_name + "---> " + title)
+                csvwriter.writerow([book_url, universal_product_code.strip(), title.strip(), price_including_tax, price_excluding_tax, number_available, category, review_rating, image_url, product_description ])
 
 
-            # Download covers pictures
-            os.makedirs('covers', exist_ok = True)
-            r = requests.get(image_url)
-            picture_name = re.sub('[^A-Za-z0-9]+', '', title)
-            filename = os.path.join('covers', picture_name)
-            open(filename, 'wb').write(r.content)
+                # Download covers pictures
+                os.makedirs('covers', exist_ok = True)
+                r = requests.get(image_url)
+                picture_name = re.sub('[^A-Za-z0-9]+', '', title)
+                filename = os.path.join('covers', picture_name)
+                open(filename, 'wb').write(r.content)
+
 
